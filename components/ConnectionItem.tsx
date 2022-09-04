@@ -11,11 +11,7 @@ import TextField from "@mui/material/TextField";
 import { faSocialNetworks, enSocialNetworks } from "./Socials";
 import { Icon, validateUrl } from "../features/functions";
 import { useMyContext } from "../context/provider";
-export default function ConnectionItem({
-  item,
-  connectionList,
-  setConnectionList,
-}: any) {
+export default function ConnectionItem({ item }: any) {
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
   const [connectionType, setConnectionType] = useState<string | any>(
@@ -48,13 +44,18 @@ export default function ConnectionItem({
       setDisabledConfirm(true);
     }
   }, [link, connectionType]);
-  const edit = () => {
-    const editedConnection = { connectionType, link, _id: item._id };
-    const arr = [...connectionList];
-    const p = arr.findIndex((i) => i._id === item._id);
-    console.log(p);
-    arr[p] = editedConnection;
-    setConnectionList(arr);
+  const edit = (id: number) => {
+    fetch(`http://localhost:3000/posts/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        connectionType: connectionType,
+        link: link,
+        _id: item._id,
+      }),
+    });
     setOpen(false);
     setDisabledEdit(false);
     setDisabledConfirm(true);
@@ -177,11 +178,9 @@ export default function ConnectionItem({
               {`${lang === "fa" ? "حذف" : "DELETE"}`}
             </Button>
             <DeleteModal
-              id={item._id}
+              id={item.id}
               openModal={openModal}
               setOpenModal={setOpenModal}
-              setConnectionList={setConnectionList}
-              connectionList={connectionList}
             />
           </Box>
         </Box>
@@ -223,6 +222,29 @@ export default function ConnectionItem({
               justifyContent="center"
               alignItems="center"
             >
+
+              <Grid item xs={6} md={8}>
+                <TextField
+                  id="outlined-basic"
+                  inputRef={textRef}
+                  label={`${lang === "fa" ? "لینک" : "Link"}`}
+                  variant="outlined"
+                  dir="rtl"
+                  fullWidth
+                  value={link}
+                  onChange={(e) => handleLink(e.target.value)}
+                />
+                <Typography
+                  fontWeight={400}
+                  fontSize={"0.64rem"}
+                  lineHeight={1.66}
+                  color="rgb(211, 47, 47)"
+                  m={"3px 14px -20px"}
+                  display={`${inValidLink ? "" : "none"}`}
+                >
+                  وارد کردن این فیلد اجباری است
+                </Typography>
+              </Grid>
               <Grid item xs={6} md={4}>
                 <Autocomplete
                   disablePortal
@@ -247,34 +269,12 @@ export default function ConnectionItem({
                   )}
                 />
               </Grid>
-              <Grid item xs={6} md={8}>
-                <TextField
-                  id="outlined-basic"
-                  inputRef={textRef}
-                  label={`${lang === "fa" ? "لینک" : "Link"}`}
-                  variant="outlined"
-                  dir="rtl"
-                  fullWidth
-                  value={link}
-                  onChange={(e) => handleLink(e.target.value)}
-                />
-                <Typography
-                  fontWeight={400}
-                  fontSize={"0.64rem"}
-                  lineHeight={1.66}
-                  color="rgb(211, 47, 47)"
-                  m={"3px 14px -20px"}
-                  display={`${inValidLink ? "" : "none"}`}
-                >
-                  وارد کردن این فیلد اجباری است
-                </Typography>
-              </Grid>
             </Grid>
             <Box
               sx={{
                 display: "flex",
                 alignItems: "center",
-                justifyContent: { xs: "flex-end" },
+                justifyContent: `${lang === "fa" ? "start" : "end"}`,
                 mt: { xs: "16px" },
               }}
             >
@@ -303,12 +303,12 @@ export default function ConnectionItem({
               </Button>
               <Button
                 disabled={disabledConfirm}
-                onClick={() => edit()}
+                onClick={() => edit(item.id)}
                 sx={{
                   color: "#000000de",
                   py: "3px",
                   px: "9px",
-                  mr: { xs: "8px" },
+                  mx: { xs: "8px" },
                   backgroundColor: "rgb(255, 168, 46)",
                   boxShadow:
                     "rgb(0 0 0 / 20%) 0px 3px 1px -2px, rgb(0 0 0 / 14%) 0px 2px 2px 0px, rgb(0 0 0 / 12%) 0px 1px 5px 0px",
@@ -321,6 +321,7 @@ export default function ConnectionItem({
                 }}
               >
                 {`${lang === "fa" ? "ویرایش مسیر ارتباطی" : "EDIT SOCIAL"}`}
+                {" "}
                 {`${connectionType === "undefined" ? "" : connectionType}`}
               </Button>
             </Box>

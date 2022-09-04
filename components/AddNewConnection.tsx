@@ -8,24 +8,29 @@ import { faSocialNetworks, enSocialNetworks } from "./Socials";
 import { UID, validateUrl } from "../features/functions";
 import { useForm, Controller } from "react-hook-form";
 import { useMyContext } from "../context/provider";
-export default function AddNewConnection({
-  checked,
-  connectionList,
-  setConnectionList,
-  setChecked,
-}: any) {
-  const { lang, setLang } = useMyContext();
+export default function AddNewConnection({ checked, data, setChecked }: any) {
+  const { lang } = useMyContext();
   const { handleSubmit, control, formState } = useForm({
     mode: "all",
   });
   const { errors }: any | undefined = formState;
   const onSubmit = (data: any): void => {
-    const newConnection = {
+    const newConnection: BodyInit | any | undefined = {
       connectionType: data.connectionType.label,
       link: data.link,
       _id: UID(),
     };
-    setConnectionList([...connectionList, newConnection]);
+    fetch("http://localhost:3000/posts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        connectionType: data.connectionType.label,
+        link: data.link,
+        _id: UID(),
+      }),
+    });
     setChecked(false);
     setLink("");
     setConnectionType("undefined");
@@ -53,6 +58,9 @@ export default function AddNewConnection({
           sx={{
             backgroundColor: "info.light",
             borderRadius: "16px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: `${lang === "fa" ? "end" : "start"}`,
           }}
         >
           <Typography
@@ -64,7 +72,7 @@ export default function AddNewConnection({
           >
             {`${lang === "fa" ? "افزودن مسیر ارتباطی" : "Add Social"}`}
           </Typography>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(onSubmit)} style={{ width: "100%" }}>
             <Grid
               container
               mb={4}
@@ -72,61 +80,6 @@ export default function AddNewConnection({
               justifyContent="center"
               alignItems="center"
             >
-              <Grid item xs={6} md={4}>
-                <Controller
-                  name="connectionType"
-                  control={control}
-                  rules={{ required: "وارد کردن این فیلد اجباری است" }}
-                  defaultValue={{
-                    label: "undefined",
-                    value: "undefined",
-                    logo: null,
-                  }}
-                  render={({
-                    field: { ref, ...field },
-                    fieldState: { error },
-                  }) => (
-                    <Autocomplete
-                      {...field}
-                      disablePortal
-                      id="combo-box-demo"
-                      componentName="connectionType"
-                      options={
-                        lang === "fa"
-                          ? faSocialNetworks
-                          : enSocialNetworks.filter(
-                              ({ label: id1 }) =>
-                                !connectionList.some(
-                                  ({ connectionType: id2 }: any) => id2 === id1
-                                )
-                            )
-                      }
-                      onChange={(event, value) => {
-                        field.onChange(value);
-                        setConnectionType(value);
-                      }}
-                      value={connectionType}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label={`${lang === "fa" ? "نوع" : "Type"}`}
-                          error={!!errors.connectionType}
-                          helperText={errors.connectionType?.message}
-                          name="connectionType"
-                          inputRef={typeRef}
-                          sx={{ color: "primary.main" }}
-                        />
-                      )}
-                      renderOption={(props, option) => (
-                        <Box component="li" sx={{}} {...props}>
-                          {option.logo}
-                          {option.label}
-                        </Box>
-                      )}
-                    />
-                  )}
-                />
-              </Grid>
               <Grid item xs={6} md={8}>
                 <Controller
                   name="link"
@@ -156,12 +109,69 @@ export default function AddNewConnection({
                   )}
                 />
               </Grid>
+              <Grid item xs={6} md={4}>
+                <Controller
+                  name="connectionType"
+                  control={control}
+                  rules={{ required: "وارد کردن این فیلد اجباری است" }}
+                  defaultValue={{
+                    label: "undefined",
+                    value: "undefined",
+                    logo: null,
+                  }}
+                  render={({
+                    field: { ref, ...field },
+                    fieldState: { error },
+                  }) => (
+                    <Autocomplete
+                      {...field}
+                      disablePortal
+                      id="combo-box-demo"
+                      dir="ltr"
+                      componentName="connectionType"
+                      options={
+                        lang === "fa"
+                          ? faSocialNetworks
+                          : enSocialNetworks.filter(
+                              ({ label: id1 }) =>
+                                !data.some(
+                                  ({ connectionType: id2 }: any) => id2 === id1
+                                )
+                            )
+                      }
+                      onChange={(event, value) => {
+                        field.onChange(value);
+                        setConnectionType(value);
+                      }}
+                      value={connectionType}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label={`${lang === "fa" ? "نوع" : "Type"}`}
+                          error={!!errors.connectionType}
+                          helperText={errors.connectionType?.message}
+                          name="connectionType"
+                          inputRef={typeRef}
+                          dir="rtl"
+                          sx={{ color: "primary.main" }}
+                        />
+                      )}
+                      renderOption={(props, option) => (
+                        <Box component="li" sx={{}} {...props}>
+                          {option.logo}
+                          {option.label}
+                        </Box>
+                      )}
+                    />
+                  )}
+                />
+              </Grid>
             </Grid>
             <Box
               sx={{
                 display: "flex",
                 alignItems: "center",
-                justifyContent: { xs: "flex-end" },
+                justifyContent: `${lang === "fa" ? "start" : "end"}`,
                 mt: { xs: "16px" },
               }}
             >
@@ -196,7 +206,7 @@ export default function AddNewConnection({
                   color: "#000000de",
                   py: "3px",
                   px: "9px",
-                  mr: { xs: "8px" },
+                  mx: { xs: "8px" },
                   backgroundColor: "rgb(255, 168, 46)",
                   boxShadow:
                     "rgb(0 0 0 / 20%) 0px 3px 1px -2px, rgb(0 0 0 / 14%) 0px 2px 2px 0px, rgb(0 0 0 / 12%) 0px 1px 5px 0px",
@@ -208,7 +218,7 @@ export default function AddNewConnection({
                   },
                 }}
               >
-                {`${lang === "fa" ? "ثبت مسیر ارتباطی" : "SUBMIT SOCIAL"}`}
+                {`${lang === "fa" ? " ثبت مسیر ارتباطی" : "SUBMIT SOCIAL "}`}{" "}
                 {`${
                   connectionType === "undefined" ||
                   connectionType === "" ||

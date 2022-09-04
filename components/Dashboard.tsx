@@ -13,15 +13,8 @@ import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { useMyContext } from "../context/provider";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-export default function Dashboard({data}:any) {
+export default function Dashboard({ data }: any) {
   const [checked, setChecked] = useState<boolean>(false);
-  const [connectionList, setConnectionList] = useState<IConnection[]>([
-    {
-      connectionType: "توییتر",
-      link: "https://mui.com/material-ui/react-card/",
-      _id: UID(),
-    },
-  ]);
   const { mode, setMode, lang, setLang } = useMyContext();
   const darkTheme = createTheme({
     palette: {
@@ -67,7 +60,6 @@ export default function Dashboard({data}:any) {
       fontFamily: `"IRANYEKAN"`,
     },
   });
-
   const THEME = mode === "dark" ? darkTheme : lightTheme;
   const toggleColorMode = (): void => {
     if (mode === "dark") {
@@ -101,7 +93,7 @@ export default function Dashboard({data}:any) {
               sx={{
                 display: "flex",
                 flexDirection: "column",
-              alignItems:`${lang === "fa" ? "flex-end" : "flex-start"}`
+                alignItems: `${lang === "fa" ? "flex-end" : "flex-start"}`,
               }}
             >
               <Typography
@@ -149,8 +141,18 @@ export default function Dashboard({data}:any) {
                 flexDirection: `${lang === "fa" ? "row-reverse" : "row"}`,
               }}
             >
-              <Button disabled={lang === "fa" ? false : true} onClick={() => setLang("en")}>English</Button>
-              <Button disabled={lang === "fa" ? true : false} onClick={() => setLang("fa")}>فارسی</Button>
+              <Button
+                disabled={lang === "fa" ? false : true}
+                onClick={() => setLang("en")}
+              >
+                English
+              </Button>
+              <Button
+                disabled={lang === "fa" ? true : false}
+                onClick={() => setLang("fa")}
+              >
+                فارسی
+              </Button>
               <IconButton
                 sx={{ ml: 1, color: "primary.dark" }}
                 onClick={toggleColorMode}
@@ -169,51 +171,56 @@ export default function Dashboard({data}:any) {
                 "rgb(0 0 0 / 20%) 0px 2px 1px -1px, rgb(0 0 0 / 14%) 0px 1px 1px 0px, rgb(0 0 0 / 12%) 0px 1px 3px 0px",
             }}
           >
-            <Typography
-              fontWeight={400}
-              fontSize={"0.642857rem"}
-              lineHeight={1.66}
-              color="primary.main"
-            >
-              {`${lang === "fa" ? "مسیرهای ارتباطی" : "Socials"}`}
-            </Typography>
-            <Button
-              variant="contained"
-              disabled={checked ? true : false}
-              onClick={() => setChecked(true)}
+            <Box
               sx={{
-                color: "secondary.main",
-                mt: 2,
-                py: "4px",
-                px: "5px",
-                boxShadow: "none",
-                backgroundColor: "transparent",
-                fontSize: { xs: "0.6rem", sm: "0.875rem" },
-                padding: { xs: "4px 6px", sm: "6px 16px" },
-                "&:hover": {
-                  boxShadow: "none",
-                  backgroundColor: "#FFFCF6",
-                },
-                "&:disabled": {
-                  backgroundColor: "transparent",
-                },
+                display: "flex",
+                flexDirection:"column",
+                alignItems:`${lang === "fa" ? "end" : "start"}`
               }}
             >
-              + {`${lang === "fa" ? "افزودن مسیر ارتباطی" : "ADD SOCIAL"}`}
-            </Button>
+              <Typography
+                fontWeight={400}
+                fontSize={"0.642857rem"}
+                lineHeight={1.66}
+                color="primary.main"
+              >
+                {`${lang === "fa" ? "مسیرهای ارتباطی" : "Socials"}`}
+              </Typography>
+              <Button
+                variant="contained"
+                disabled={checked ? true : false}
+                onClick={() => setChecked(true)}
+                sx={{
+                  color: "secondary.main",
+                  mt: 2,
+                  py: "4px",
+                  px: "5px",
+                  boxShadow: "none",
+                  backgroundColor: "transparent",
+                  fontSize: { xs: "0.6rem", sm: "0.875rem" },
+                  padding: { xs: "4px 6px", sm: "6px 16px" },
+                  "&:hover": {
+                    boxShadow: "none",
+                    backgroundColor: "#FFFCF6",
+                  },
+                  "&:disabled": {
+                    backgroundColor: "transparent",
+                  },
+                }}
+              >
+                + {`${lang === "fa" ? "افزودن مسیر ارتباطی" : "ADD SOCIAL"}`}
+              </Button>
+            </Box>
             <AddNewConnection
               checked={checked}
-              setConnectionList={setConnectionList}
-              connectionList={data}
               setChecked={setChecked}
+              data={data}
             />
             <List>
-              {data.map((item:any, index:number) => (
+              {data.map((item: any, index: number) => (
                 <ConnectionItem
                   key={index}
                   item={item}
-                  connectionList={data}
-                  setConnectionList={setConnectionList}
                 />
               ))}
             </List>

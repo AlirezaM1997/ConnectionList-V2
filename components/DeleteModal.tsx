@@ -4,8 +4,7 @@ import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import TextField from "@mui/material/TextField";
-import { useState, useRef, useEffect } from "react";
+import { useMyContext } from "../context/provider";
 const style = {
   position: "absolute" as "absolute",
   top: "50%",
@@ -19,32 +18,19 @@ const style = {
 export default function DeleteModal({
   openModal,
   setOpenModal,
-  setConnectionList,
-  connectionList,
   id,
 }: any) {
+  const { lang } = useMyContext();
   const handleClose = () => setOpenModal(false);
-  const [disabled, setDisabled] = useState<boolean>(true);
-  const [name, setName] = useState<string>("");
-  const textRef: any = useRef();
-  const handleInput = (e: string) => {
-    if (textRef.current.value === "تایید") {
-      setDisabled(false);
-    } else {
-      setDisabled(true);
-    }
-  };
   const deleteItem = (id: number | string) => {
-    const arr = [...connectionList];
-    const p = arr.findIndex((item) => item._id === id);
-    arr.splice(p, 1);
-    setConnectionList(arr);
+    fetch(`http://localhost:3000/posts/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    })
   };
-  useEffect(() => {
-    const n = connectionList.filter((item: any) => item._id === id)[0]
-      .connectionType;
-    setName(n);
-  }, []);
+
   return (
     <div>
       <Modal
@@ -61,31 +47,18 @@ export default function DeleteModal({
         <Fade in={openModal}>
           <Box sx={style}>
             <Typography
-              dir="rtl"
+              dir={`${lang === "fa" ? "rtl" : "ltr"}`}
               id="transition-modal-title"
               fontSize={"1.07rem"}
               variant="h6"
               component="h2"
             >
-              آیا از تصمیم خود مطمئن هستید؟
+              {`${
+                lang === "fa"
+                  ? "آیا از تصمیم خود مطمئن هستید؟"
+                  : "Are you sure?"
+              }`}
             </Typography>
-            <Typography
-              dir="rtl"
-              id="transition-modal-description"
-              fontSize={"0.85rem"}
-              sx={{ my: 3 }}
-            >
-              برای حذف مسیر ارتباطی {name} لطفا "تایید" را وارد نمایید.
-            </Typography>
-            <TextField
-              id="outlined-basic"
-              inputRef={textRef}
-              label="تایید*"
-              variant="outlined"
-              dir="rtl"
-              fullWidth
-              onChange={(e) => handleInput(e.target.value)}
-            />
             <Box
               sx={{
                 display: "flex",
@@ -113,14 +86,12 @@ export default function DeleteModal({
                   },
                 }}
               >
-                انصراف
+                {`${lang === "fa" ? "انصراف" : "CANCEL"}`}
               </Button>
               <Button
-                disabled={disabled}
                 onClick={() => {
                   deleteItem(id);
                   handleClose();
-                  setDisabled(true)
                 }}
                 sx={{
                   color: "#000000de",
@@ -138,7 +109,7 @@ export default function DeleteModal({
                   },
                 }}
               >
-                حذف
+                {`${lang === "fa" ? "حذف" : "DELETE"}`}
               </Button>
             </Box>
           </Box>
